@@ -107,15 +107,8 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		return $this->RunCMD($cmd);
 	}
 
-	public function LookupDns($host) {
+	public function LookupDns($host, $type) {
 		if(!$this->CheckParams()) return false;
-		if($this->_is_IP($host)) {
-			$host = $this->_Ip2Rdns($host);
-			$type = "ptr";
-		}
-		else {
-			$type = "any";
-		}
 		$cmd = str_replace('__HOST__', $host, $this->cmds['dns']);
 		$cmd = str_replace('__TYPE__', $type, $cmd);
 		return $this->RunCMD($cmd);

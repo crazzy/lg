@@ -91,7 +91,15 @@ else {
 			$result = $plugin->LookupBgp($lookup);
 			break;
 		case LG_FORM_TYPE_DNS:
-			$result = $plugin->LookupDns($lookup);
+			if($plugin->_is_IP($lookup)) {
+				$lookup_host = $plugin->_Ip2Rdns($lookup);
+				$dns_type = 'ptr';
+			}
+			else {
+				$lookup_host = $lookup;
+				$dns_type = 'any';
+			}
+			$result = $plugin->LookupDns($lookup_host, $dns_type);
 			break;
 	}
 	if(false === $async) {

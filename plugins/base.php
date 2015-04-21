@@ -27,7 +27,7 @@ class LG_PluginBase {
 		return false;
 	}
 
-	protected function _is_IP($ip) {
+	public function _is_IP($ip) {
 		$filter_options = array(
 			'options' => array(
 				'default' => false
@@ -40,7 +40,7 @@ class LG_PluginBase {
 		return false;
 	}
 
-	protected function _Ip2Rdns($ip) {
+	public function _Ip2Rdns($ip) {
 		if(false !== strpos($ip, ':')) {
 			$addr = inet_pton($ip);
 			$unpack = unpack('H*hex', $addr);
