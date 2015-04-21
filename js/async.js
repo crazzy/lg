@@ -66,6 +66,7 @@ $(document).ready(function() {
 	$("form").each(function(index, value) {
 		window.lg_async_error = false;
 		$(value).submit(function() {
+			$("pre").remove();
 			$.ajax({
 				url: '/',
 				context: document.body,
