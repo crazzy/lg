@@ -93,6 +93,20 @@ class LG_PluginBase {
 		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id . '_nochunks', $chunks);
 	}
 
+	protected function _AsyncSetStatus($async_id, $status) {
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, $status);
+		//call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, $status));
+	}
+
+	protected function _AsyncWriteData($async_id, $chunkno, $data) {
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id . '_ch_' . $chunkno, $data);
+		//call_user_func_array($this->async_callback, array($data, $chunkno, $async_id));
+	}
+
 	/* These functions should be overloaded by sub-classes */
 
 	public function LookupPing($host) {

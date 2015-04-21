@@ -57,9 +57,9 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$i = 0;
 		while($buf = fread($stream, 4096)) {
 			if(false !== $async) {
-				call_user_func_array($this->async_callback, array($buf, $i, $async_id));
+				$this->_AsyncWriteData($async_id, $i, $buf);
 				if($i == 0) {
-					call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'data'));
+					$this->_AsyncSetStatus($async_id, 'data');
 				}
 				$i += 1;
 			}
@@ -72,7 +72,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$ssh = null;
 		if(false !== $async) {
 			$this->_AsyncSetChunks($async_id, $i-1);
-			call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'complete'));
+			$this->_AsyncSetStatus($async_id, 'complete');
 			die();
 		}
 		else {
