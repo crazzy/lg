@@ -19,11 +19,17 @@ if(!preg_match('/^[0-9]+$/', $nextchunk)) {
 /* Check status and if we have more data */
 $status = $memcache->get($global_config['memcache_prefix'] . '_async_' . $async_id);
 if(false === $status) die("error");
+header("X-LG-Async-Status: $status\r\n");
 if("error" == $status) die("error");
 if("init" == $status) die("init");
 if("data" == $status) {
 	$data = $memcache->get($global_config['memcache_prefix'] . '_async_' . $async_id . '_ch_' . $nextchunk);
 	if(false === $data) {
+		header("X-LG-Async-Status: wait\r\n", TRUE);
+		die("wait");
+	}
+	elseif(empty($data)) {
+		header("X-LG-Async-Status: wait\r\n", TRUE);
 		die("wait");
 	}
 	else {
@@ -35,7 +41,6 @@ if("complete" == $status) {
 	if(false === $tot_chunks) {
 		die("error");
 	}
-	header("X-LG-Async-Status: complete\r\n");
 	for($i = $nextchunk; $i <= $tot_chunks; ++$i) {
 		echo $memcache->get($global_config['memcache_prefix'] . '_async_' . $async_id . '_ch_' . $i);
 	}
