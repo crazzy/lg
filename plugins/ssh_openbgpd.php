@@ -19,59 +19,68 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		return true;
 	}
 
-	private function RunCMDAsync($cmd) {
-		global $async_id;
-		$this->_CheckAsync($async_id);
-		$ssh = ssh2_connect($this->router);
-		if(!is_resource($ssh)) $this->AbortAsync($async_id);
-		if(!ssh2_auth_password($ssh, $this->pluginparams['ssh_username'], $this->pluginparams['ssh_password'])) {
-			$ssh = null;
-			$this->AbortAsync($async_id);
-		}
-		if(!($stream = ssh2_exec($ssh, $cmd))) {
-			$ssh = null;
-			$this->AbortAsync($async_id);
-		}
-		stream_set_blocking($stream, true);
-		$i = 0;
-		while($buf = fread($stream, 4096)) {
-			call_user_func_array($this->async_callback, array($buf, $i, $async_id));
-			if($i == 0) {
-				call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'data'));
-			}
-			$i += 1;
-		}
-		fclose($stream);
-		$this->_AsyncSetChunks($async_id, $i-1);
-		call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'complete'));
-		ssh2_exec($ssh, "exit");
-		$ssh = null;
-		die();
-	}
-
 	private function RunCMD($cmd) {
+		global $async;
+		if(false !== $async) {
+			global $async_id;
+			$this->_CheckAsync($async_id);
+		}
 		$ssh = ssh2_connect($this->router);
-		if(!is_resource($ssh)) return false;
+		if(!is_resource($ssh)) {
+			if(false !== $async) {
+				$this->AbortAsync($async_id);
+			}
+			else {
+				return false;
+			}
+		}
 		if(!ssh2_auth_password($ssh, $this->pluginparams['ssh_username'], $this->pluginparams['ssh_password'])) {
 			$ssh = null;
-			return false;
+			if(false !== $async) {
+				$this->AbortAsync($async_id);
+			}
+			else {
+				return false;
+			}
 		}
 		if(!($stream = ssh2_exec($ssh, $cmd))) {
 			$ssh = null;
-			return false;
+			if(false !== $async) {
+				$this->AbortAsync($async_id);
+			}
+			else {
+				return false;
+			}
 		}
 		stream_set_blocking($stream, true);
 		$result = "";
+		$i = 0;
 		while($buf = fread($stream, 4096)) {
-			$result .= $buf;
+			if(false !== $async) {
+				call_user_func_array($this->async_callback, array($buf, $i, $async_id));
+				if($i == 0) {
+					call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'data'));
+				}
+				$i += 1;
+			}
+			else {
+				$result .= $buf;
+			}
 		}
 		fclose($stream);
 		ssh2_exec($ssh, "exit");
 		$ssh = null;
-		if($result == "") {
-			return false;
+		if(false !== $async) {
+			$this->_AsyncSetChunks($async_id, $i-1);
+			call_user_func_array($this->async_callback, array(NULL, NULL, $async_id, 'complete'));
+			die();
 		}
-		return $result;
+		else {
+			if($result == "") {
+				return false;
+			}
+			return $result;
+		}
 	}
 
 	public function LookupPing($host) {
@@ -79,12 +88,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$host = $this->_HostToIP($host);
 		if(false === $host) return false;
 		$cmd = str_replace('__HOST__', $host, $this->cmds['ping']);
-		if(false === $this->async_callback) {
-			return $this->RunCMD($cmd);
-		}
-		else {
-			$this->RunCMDAsync($cmd);
-		}
+		return $this->RunCMD($cmd);
 	}
 
 	public function LookupTraceroute($host) {
@@ -92,12 +96,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$host = $this->_HostToIP($host);
 		if(false === $host) return false;
 		$cmd = str_replace('__HOST__', $host, $this->cmds['traceroute']);
-		if(false === $this->async_callback) {
-			return $this->RunCMD($cmd);
-		}
-		else {
-			$this->RunCMDAsync($cmd);
-		}
+		return $this->RunCMD($cmd);
 	}
 
 	public function LookupBgp($host) {
@@ -105,12 +104,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$host = $this->_HostToIP($host);
 		if(false === $host) return false;
 		$cmd = str_replace('__HOST__', $host, $this->cmds['bgp']);
-		if(false === $this->async_callback) {
-			return $this->RunCMD($cmd);
-		}
-		else {
-			$this->RunCMDAsync($cmd);
-		}
+		return $this->RunCMD($cmd);
 	}
 
 	public function LookupDns($host) {
@@ -124,12 +118,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		}
 		$cmd = str_replace('__HOST__', $host, $this->cmds['dns']);
 		$cmd = str_replace('__TYPE__', $type, $cmd);
-		if(false === $this->async_callback) {
-			return $this->RunCMD($cmd);
-		}
-		else {
-			$this->RunCMDAsync($cmd);
-		}
+		return $this->RunCMD($cmd);
 	}
 
 };
