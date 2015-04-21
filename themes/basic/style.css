@@ -15,32 +15,28 @@ header {
 header > * {
 	display: inline;
 }
-fieldset {
+.container {
 	display: block;
-	width: 500px;
+	width: 800px;
 	height: auto;
 	margin: 15px auto;
+}
+form {
+	margin-bottom: 25px;
+}
+fieldset {
+	display: block;
+}
+fieldset .labels label {
+	margin: 5px 15px;
+}
+fieldset .fields > * {
+	margin: 5px 15px;
+}
+input[type="submit"] {
+	margin-left: 5px;
+	padding: 5px;
 	border-radius: 5px;
-	padding: 10px;
-}
-fieldset > .labels, fieldset .fields, fieldset .controls {
-	display: block;
-	clear: both;
-	margin: 5px auto;
-}
-fieldset > .labels > *, fieldset > .fields > *, fieldset > .controls > * {
-	display: block;
-	float: left;
-}
-fieldset select {
-	margin-left: 50px;
-}
-fieldset label[for="lg_router"] {
-	margin-left: 25px;
-}
-.clearfix {
-	display: block;
-	clear: both;
 }
 footer {
 	display: block;
