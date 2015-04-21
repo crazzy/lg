@@ -37,8 +37,10 @@ function lg_async_handler() {
 				return true;
 			}
 			if(data.trim() == "") {
-				window.lg_async_timer = setTimeout(lg_async_handler, 500);
-				return true;
+				if(lg_status != 'complete') {
+					window.lg_async_timer = setTimeout(lg_async_handler, 500);
+					return true;
+				}
 			}
 			if(window.lg_has_data === false) {
 				window.lg_has_data = true;
