@@ -39,6 +39,7 @@ if("data" == $status) {
 if("complete" == $status) {
 	$tot_chunks = $memcache->get($global_config['memcache_prefix'] . '_async_' . $async_id . '_nochunks');
 	if(false === $tot_chunks) {
+		header("X-LG-Async-Status: error\r\n", TRUE);
 		die("error");
 	}
 	for($i = $nextchunk; $i <= $tot_chunks; ++$i) {
