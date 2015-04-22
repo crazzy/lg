@@ -75,6 +75,22 @@ function theme_type_enabled($type) {
 }
 
 /* Ratelimit functions */
+function rlimit_cidrmatcher($ip, $cidr) {
+	if(false!==strpos($ip, ':')) {
+		require "Net/IPv6.php";
+		return Net_IPv6::isInNetmask($ip, $cidr);
+	}
+	else {
+		require "Net/IPv4.php";
+		return Net_IPv4::ipInNetwork($ip, $cidr);
+	}
+}
+function rlimit_whitelisted($ip) {
+	foreach($global_config['ratelimit_whitelist'] as $wl) {
+		if(rlimit_cidrmatcher($ip, $wl)) return true;
+	}
+	return false;
+}
 function rlimit_push() {
 	global $memcache;
 	global $global_config;
@@ -88,7 +104,7 @@ function rlimit_check() {
 	global $memcache;
 	global $global_config;
 	if(empty($_SERVER['REMOTE_ADDR'])) return true;
-	## TODO: if cidr match whitelist return true;
+	if(rlimit_whitelisted($_SERVER['REMOTE_ADDR'])) return true;
 	$min = date('i');
 	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min);
 	if(false===$cur_rate) $cur_rate = 0;
@@ -106,7 +122,7 @@ function rlimit_gl_push() {
 function rlimit_gl_check() {
 	global $memcache;
 	global $global_config;
-	## TODO: if cifr match whitelist return true;
+	if(rlimit_whitelisted($_SERVER['REMOTE_ADDR'])) return true;
 	$min = date('i');
 	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_global_' . $min);
 	if(false===$cur_rate) $cur_rate = 0;
