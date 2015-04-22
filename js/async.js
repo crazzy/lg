@@ -1,3 +1,10 @@
+/*
+ * LG - Looking Glass
+ *
+ * @author: Johan Hedberg <mail@johan.pp.se>
+ *
+ * @license: See LICENSE file here: https://github.com/crazzy/lg
+ */
 var lg_async_error = false;
 var lg_has_data = false;
 var lg_request_complete = false;

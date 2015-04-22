@@ -1,4 +1,11 @@
 <?php
+/*
+ * LG - Looking Glass
+ *
+ * @author: Johan Hedberg <mail@johan.pp.se>
+ *
+ * @license: See LICENSE file here: https://github.com/crazzy/lg
+ */
 
 class LG_PluginBase {
 
