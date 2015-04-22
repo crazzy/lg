@@ -8,7 +8,7 @@
  */
 # Inclusions
 require "config.php";
-require "util.php";
+require "lib/util.php";
 
 /* Check valid call and valid input data */
 if(!isset($_SERVER['REQUEST_METHOD']) || ($_SERVER['REQUEST_METHOD'] != 'POST')) {

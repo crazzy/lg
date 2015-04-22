@@ -18,7 +18,7 @@ define('LG_FORM_TYPE_DNS', 'lg_type_dns');
 
 # Inclusions
 require "config.php";
-require "util.php";
+require "lib/util.php";
 require "plugins/base.php";
 
 if(!isset($_SERVER['REQUEST_METHOD']) || ($_SERVER['REQUEST_METHOD'] != 'POST')) {
