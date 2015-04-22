@@ -55,6 +55,7 @@ else {
 	}
 	else {
 		$async = false;
+		$async_id = null;
 	}
 
 	/* Loading of plugin */
@@ -67,7 +68,7 @@ else {
 	else {
 		$pluginparams = array();
 	}
-	$plugin = new $pluginname($routers[$router]['address'], $pluginparams, $async);
+	$plugin = new $pluginname($routers[$router]['address'], $pluginparams, $async, $async_id);
 
 	/* Call plugin */
 	$result = "";

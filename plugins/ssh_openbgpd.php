@@ -9,8 +9,8 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		'dns' => '/usr/sbin/dig -t __TYPE__ __HOST__'
 	);
 
-	public function __construct($router, $pluginparams = array(), $async=false) {
-		parent::__construct($router, $pluginparams, $async);
+	public function __construct($router, $pluginparams = array(), $async=false, $async_id=null) {
+		parent::__construct($router, $pluginparams, $async, $async_id);
 	}
 
 	private function CheckParams() {
@@ -20,13 +20,10 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 	}
 
 	private function RunCMD($cmd) {
-		if($this->async) {
-			global $async_id;
-		}
 		$ssh = ssh2_connect($this->router);
 		if(!is_resource($ssh)) {
 			if($this->async) {
-				$this->AbortAsync($async_id);
+				$this->AbortAsync();
 			}
 			else {
 				return false;
@@ -35,7 +32,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		if(!ssh2_auth_password($ssh, $this->pluginparams['ssh_username'], $this->pluginparams['ssh_password'])) {
 			$ssh = null;
 			if($this->async) {
-				$this->AbortAsync($async_id);
+				$this->AbortAsync();
 			}
 			else {
 				return false;
@@ -44,7 +41,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		if(!($stream = ssh2_exec($ssh, $cmd))) {
 			$ssh = null;
 			if($this->async) {
-				$this->AbortAsync($async_id);
+				$this->AbortAsync();
 			}
 			else {
 				return false;
@@ -55,9 +52,9 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$i = 0;
 		while($buf = fread($stream, 4096)) {
 			if($this->async) {
-				$this->_AsyncWriteData($async_id, $i, $buf);
+				$this->_AsyncWriteData($i, $buf);
 				if($i == 0) {
-					$this->_AsyncSetStatus($async_id, 'data');
+					$this->_AsyncSetStatus('data');
 				}
 				$i += 1;
 			}
@@ -69,8 +66,8 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		ssh2_exec($ssh, "exit");
 		$ssh = null;
 		if($this->async) {
-			$this->_AsyncSetChunks($async_id, $i-1);
-			$this->_AsyncSetStatus($async_id, 'complete');
+			$this->_AsyncSetChunks($i-1);
+			$this->_AsyncSetStatus('complete');
 			die();
 		}
 		else {

@@ -5,11 +5,13 @@ class LG_PluginBase {
 	protected $router;
 	protected $pluginparams;
 	protected $async;
+	protected $async_id;
 
-	public function __construct($router, $pluginparams = array(), $async=false) {
+	public function __construct($router, $pluginparams = array(), $async=false, $async_id=null) {
 		$this->router = $router;
 		$this->pluginparams = $pluginparams;
 		$this->async = $async;
+		$this->async_id = $async_id;
 	}
 
 	protected function _FollowCNAME($host, $calls=0) {
@@ -73,29 +75,29 @@ class LG_PluginBase {
 		return false;
 	}
 
-	protected function _AbortAsync($async_id) {
+	protected function _AbortAsync() {
 		global $memcache;
 		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, 'error');
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, 'error');
 		die();
 	}
 
-	protected function _AsyncSetChunks($async_id, $chunks) {
+	protected function _AsyncSetChunks($chunks) {
 		global $memcache;
 		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id . '_nochunks', $chunks);
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_nochunks', $chunks);
 	}
 
-	protected function _AsyncSetStatus($async_id, $status) {
+	protected function _AsyncSetStatus($status) {
 		global $memcache;
 		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, $status);
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, $status);
 	}
 
-	protected function _AsyncWriteData($async_id, $chunkno, $data) {
+	protected function _AsyncWriteData($chunkno, $data) {
 		global $memcache;
 		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id . '_ch_' . $chunkno, $data);
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_ch_' . $chunkno, $data);
 	}
 
 	/* These functions should be overloaded by sub-classes */
