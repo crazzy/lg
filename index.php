@@ -43,8 +43,18 @@ else {
 	$router = lg_validate_input($_POST[LG_FORM_ROUTER], 'router');
 	$lookup = lg_validate_input($_POST[LG_FORM_LOOKUP], 'lookup');
 	$lookuptype = lg_validate_input($_POST[LG_FORM_LOOKUPTYPE], 'lookuptype');
+
+	/* Check whether we're running async */
+	if(isset($_POST['async'])) {
+		$async = true;
+	}
+	else {
+		$async = false;
+	}
+
+	/* Ratelimiting */
 	if(!rlimit_check() or !rlimit_gl_check()) {
-		if(isset($_POST['async'])) {
+		if($async) {
 			die("ratelimit");
 		}
 		else {
@@ -56,8 +66,7 @@ else {
 	rlimit_gl_push();
 
 	/* Async? Prepare for that! */
-	if(isset($_POST['async'])) {
-		$async = true;
+	if($async) {
 		$async_id = uniqid();
 		LG_cache::set("async_{$async_id}", 'init');
 		set_time_limit(0);
@@ -73,7 +82,6 @@ else {
 		flush();
 	}
 	else {
-		$async = false;
 		$async_id = null;
 	}
 
@@ -116,9 +124,10 @@ else {
 	if(false === $async) {
 		if(false === $result) {
 			require "themes/{$global_config['theme']}/error_plugin.php";
-			die();
 		}
-		require "themes/{$global_config['theme']}/result.php";
+		else {
+			require "themes/{$global_config['theme']}/result.php";
+		}
 	}
 	else {
 		$plugin->_AbortAsync();
