@@ -10,6 +10,7 @@
 $global_config = array(
 	'companyname' => 'MyCompany',
 	'companylink' => 'http://example.org',
+	'companyname' => '',
 	'theme' => 'basic',
 	'memcache_host' => '127.0.0.1',
 	'memcache_port' => '11211',

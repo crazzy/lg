@@ -10,6 +10,9 @@
 </head>
 <body>
 	<header>
+		<?php if(!empty($global_config['companylogo'])): ?>
+		<img src="<?php echo $global_config['companylogo']; ?>" /><br />
+		<?php endif; ?>
 		<h1><?php echo $global_config['companyname']; ?></h1> - <h2>Looking Glass</h2>
 	</header>
 	<hr />
