@@ -7,8 +7,10 @@ $global_config = array(
 	'memcache_host' => '127.0.0.1',
 	'memcache_port' => '11211',
 	'memcache_prefix' => 'lg',
-	'ratelimit_global' => '60', # Per minute
-	'ratelimit_perip' => '5'
+	'ratelimit_global' => 60, # Per minute
+	'ratelimit_perip' => 5,
+	'ratelimit_whitelist' => array(),
+	'checks_enabled' => array('ping', 'traceroute', 'dns', 'bgp')
 );
 $routers = array(
 	'rtr1' => array(
