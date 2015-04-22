@@ -37,10 +37,9 @@
 		</form>
 		<?php if(isset($error) && $error): ?>
 		<h3 class="text-center">>Error!</h3>
-		<div class="errmsg"><?php echo $error_str; ?></div>
+		<p class="errmsg"><?php echo $error_str; ?></p>
 		<?php endif; ?>
 		<?php if(isset($result) && (false!==$result) && !empty($result)): ?>
-		<h3 class="text-center">Result</h3>
 		<pre><?php echo htmlspecialchars($result, ENT_QUOTES); ?></pre>
 		<?php endif; ?>
 	</div>

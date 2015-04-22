@@ -6,8 +6,7 @@ var lg_async_nextchunk = null;
 var lg_async_timer = null;
 function lg_async_handle_error(jqXHR, textStatus, errorThrown) {
 	window.lg_async_error = true;
-	alert(textStatus);
-	alert(errorThrown);
+	$("form").after('<h3>Error!</h3><p class="errmsg">There was an error sending/handling the request, please check the input data and try again.</p>');
 }
 function lg_async_handler() {
 	$.ajax({
@@ -59,6 +58,8 @@ function lg_async_handler() {
 $(document).ready(function() {
 	$("form").each(function(index, value) {
 		$(value).submit(function() {
+			$("h3").remove();
+			$(".errmsg").remove();
 			$("pre").remove();
 			window.lg_async_error = false;
 			window.lg_has_data = false;
@@ -80,7 +81,8 @@ $(document).ready(function() {
 					window.lg_async_nextchunk = 0;
 					async_id = async_id.toString().trim();
 					if(async_id == "") {
-						alert("errar!");
+						lg_async_handle_error(jqXHR, textStatus, 'LG_no_async_id_from_server');
+						return false;
 					}
 					window.lg_async_id = async_id;
 					window.lg_has_data = false;
