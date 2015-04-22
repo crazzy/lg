@@ -75,7 +75,7 @@ class LG_PluginBase {
 		return false;
 	}
 
-	protected function _AbortAsync() {
+	public function _AbortAsync() {
 		global $memcache;
 		global $global_config;
 		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, 'error');

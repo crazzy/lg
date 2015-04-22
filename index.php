@@ -112,4 +112,7 @@ else {
 		}
 		require "themes/{$global_config['theme']}/result.php";
 	}
+	else {
+		$plugin->_AbortAsync();
+	}
 }

@@ -29,6 +29,7 @@ function lg_async_handler() {
 			}
 			if(lg_status == "error") {
 				window.lg_async_error = true;
+				lg_async_handle_error(jqXHR, textStatus, 'error');
 				return false;
 			}
 			if(lg_status == "init") {

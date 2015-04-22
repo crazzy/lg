@@ -77,15 +77,16 @@ function theme_type_enabled($type) {
 /* Ratelimit functions */
 function rlimit_cidrmatcher($ip, $cidr) {
 	if(false!==strpos($ip, ':')) {
-		require "Net/IPv6.php";
+		require_once "Net/IPv6.php";
 		return Net_IPv6::isInNetmask($ip, $cidr);
 	}
 	else {
-		require "Net/IPv4.php";
+		require_once "Net/IPv4.php";
 		return Net_IPv4::ipInNetwork($ip, $cidr);
 	}
 }
 function rlimit_whitelisted($ip) {
+	global $global_config;
 	foreach($global_config['ratelimit_whitelist'] as $wl) {
 		if(rlimit_cidrmatcher($ip, $wl)) return true;
 	}
