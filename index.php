@@ -38,16 +38,7 @@ else {
 
 	/* Async? Prepare for that! */
 	if(isset($_POST['async'])) {
-		$async = function($data, $chunkno, $async_id, $chstatus = false) {
-			global $global_config;
-			global $memcache;
-			if(false === $chstatus) {
-				$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id . '_ch_' . $chunkno, $data);
-			}
-			else {
-				$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, $chstatus);
-			}
-		};
+		$async = true;
 		$async_id = uniqid();
 		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, 'init');
 		set_time_limit(0);

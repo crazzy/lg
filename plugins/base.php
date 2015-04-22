@@ -4,12 +4,12 @@ class LG_PluginBase {
 
 	protected $router;
 	protected $pluginparams;
-	protected $async_callback;
+	protected $async;
 
-	public function __construct($router, $pluginparams = array(), $async_callback=false) {
+	public function __construct($router, $pluginparams = array(), $async=false) {
 		$this->router = $router;
 		$this->pluginparams = $pluginparams;
-		$this->async_callback = $async_callback;
+		$this->async = $async;
 	}
 
 	protected function _FollowCNAME($host, $calls=0) {
@@ -81,7 +81,7 @@ class LG_PluginBase {
 	}
 
 	protected function _CheckAsync($async_id) {
-		if(!is_callable($this->async_callback)) {
+		if(!$this->async) {
 			$this->_AbortAsync($async_id);
 		}
 		return true;

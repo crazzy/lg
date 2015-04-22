@@ -9,8 +9,8 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		'dns' => '/usr/sbin/dig -t __TYPE__ __HOST__'
 	);
 
-	public function __construct($router, $pluginparams = array(), $async_callback=false) {
-		parent::__construct($router, $pluginparams, $async_callback);
+	public function __construct($router, $pluginparams = array(), $async=false) {
+		parent::__construct($router, $pluginparams, $async);
 	}
 
 	private function CheckParams() {
