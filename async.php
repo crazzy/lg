@@ -11,51 +11,57 @@ require "config.php";
 require "lib/cache.php";
 require "lib/util.php";
 
+function lg_async_error() {
+	header("X-LG-Async-Status: error\r\n", TRUE);
+	die("error");
+}
+
 /* Check valid call and valid input data */
 if(!isset($_SERVER['REQUEST_METHOD']) || ($_SERVER['REQUEST_METHOD'] != 'POST')) {
-	die();
+	lg_async_error();
 }
 $async_id = isset($_POST['async_id']) ? $_POST['async_id'] : '';
 if(!preg_match('/^[a-z0-9]+$/', $async_id)) {
-	die();
+	lg_async_error();
 }
 $nextchunk = isset($_POST['nextchunk']) ? $_POST['nextchunk'] : '';
 if(!preg_match('/^[0-9]+$/', $nextchunk)) {
-	die();
+	lg_async_error();
 }
 
 /* Check status and if we have more data */
 $status = LG_cache::get("async_$async_id");
 if(false === $status) die("error");
 header("X-LG-Async-Status: $status\r\n");
-if("error" == $status) die("error");
-if("init" == $status) die("init");
-
-/* It seems we have data */
-if("data" == $status) {
-	$data = LG_cache::get("async_{$async_id}_ch_{$nextchunk}");
-	if(false === $data) {
-		header("X-LG-Async-Status: wait\r\n", TRUE);
-		die("wait");
-	}
-	elseif(empty($data)) {
-		header("X-LG-Async-Status: wait\r\n", TRUE);
-		die("wait");
-	}
-	else {
-		die($data);
-	}
-}
-
-/* The request is fully completed, output last data */
-if("complete" == $status) {
-	$tot_chunks = LG_cache::get("async_{$async_id}_nochunks");
-	if(false === $tot_chunks) {
-		header("X-LG-Async-Status: error\r\n", TRUE);
+switch($status) {
+	case 'init':
+		die("init");
+		break;
+	case 'error':
+		lg_async_error();
+		break;
+	case 'data':
+		$data = LG_cache::get("async_{$async_id}_ch_{$nextchunk}");
+		if((false === $data) || empty($data)) {
+			header("X-LG-Async-Status: wait\r\n", TRUE);
+			die("wait");
+		}
+		else {
+			die($data);
+		}
+		break;
+	case 'complete':
+		$tot_chunks = LG_cache::get("async_{$async_id}_nochunks");
+		if(false === $tot_chunks) {
+			lg_async_error();
+		}
+		for($i = $nextchunk; $i <= $tot_chunks; ++$i) {
+			echo LG_cache::get("async_{$async_id}_ch_{$i}");
+		}
+		break;
+	default:
 		die("error");
-	}
-	for($i = $nextchunk; $i <= $tot_chunks; ++$i) {
-		echo LG_cache::get("async_{$async_id}_ch_{$i}");
-	}
-	die();
+		break;
 }
+
+
