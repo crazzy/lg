@@ -7,11 +7,6 @@
  * @license: See LICENSE file here: https://github.com/crazzy/lg
  */
 
-/* Connecting to memcache */
-global $global_config;
-$memcache = new Memcache();
-$memcache->connect($global_config['memcache_host'], $global_config['memcache_port']);
-
 /* Input validation stuff */
 function lg_validate_input($input, $type) {
 	global $routers;
@@ -84,6 +79,7 @@ function theme_type_enabled($type) {
 /* Ratelimit functions */
 function rlimit_cidrmatcher($ip, $cidr) {
 	if(false!==strpos($ip, ':')) {
+		$ip = "$ip/128";
 		require_once "Net/IPv6.php";
 		return Net_IPv6::isInNetmask($ip, $cidr);
 	}
@@ -92,47 +88,44 @@ function rlimit_cidrmatcher($ip, $cidr) {
 		return Net_IPv4::ipInNetwork($ip, $cidr);
 	}
 }
-function rlimit_whitelisted($ip) {
+function rlimit_whitelisted() {
 	global $global_config;
+	$ip = $_SERVER['REMOTE_ADDR'];
 	foreach($global_config['ratelimit_whitelist'] as $wl) {
 		if(rlimit_cidrmatcher($ip, $wl)) return true;
 	}
 	return false;
 }
 function rlimit_push() {
-	global $memcache;
-	global $global_config;
-	if(empty($_SERVER['REMOTE_ADDR'])) return false;
+	$ip = $_SERVER['REMOTE_ADDR'];
+	if(empty($ip)) return false;
 	$min = date('i');
-	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min);
+	$cur_rate = LG_cache::get("rlimit_{$ip}_{$min}");
 	if(false===$cur_rate) $cur_rate = 0;
-	$memcache->set($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min, $cur_rate+1, 0, 120);
+	LG_cache::set("rlimit_{$ip}_{$min}", $cur_rate+1, 120);
 }
 function rlimit_check() {
-	global $memcache;
 	global $global_config;
-	if(empty($_SERVER['REMOTE_ADDR'])) return true;
-	if(rlimit_whitelisted($_SERVER['REMOTE_ADDR'])) return true;
+	$ip = $_SERVER['REMOTE_ADDR'];
+	if(empty($ip)) return true;
+	if(rlimit_whitelisted()) return true;
 	$min = date('i');
-	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min);
+	$cur_rate = LG_cache::get("rlimit_{$ip}_{$min}");
 	if(false===$cur_rate) $cur_rate = 0;
 	if($cur_rate >= $global_config['ratelimit_perip']) return false;
 	return true;
 }
 function rlimit_gl_push() {
-	global $memcache;
-	global $global_config;
 	$min = date('i');
-	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_global_' . $min);
+	$cur_rate = LG_cache::get("rlimit_global_{$min}");
 	if(false===$cur_rate) $cur_rate = 0;
-	$memcache->set($global_config['memcache_prefix'] . '_rlimit_global_' . $min, $cur_rate, 0, 120);
+	LG_cache::set("rlimit_global_{$min}", $cur_rate+1, 120);
 }
 function rlimit_gl_check() {
-	global $memcache;
 	global $global_config;
-	if(rlimit_whitelisted($_SERVER['REMOTE_ADDR'])) return true;
+	if(rlimit_whitelisted()) return true;
 	$min = date('i');
-	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_global_' . $min);
+	$cur_rate = LG_cache::get("rlimit_global_{$min}");
 	if(false===$cur_rate) $cur_rate = 0;
 	if($cur_rate >= $global_config['ratelimit_global']) return false;
 	return true;

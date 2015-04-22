@@ -83,28 +83,20 @@ class LG_PluginBase {
 	}
 
 	public function _AbortAsync() {
-		global $memcache;
-		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, 'error');
+		$this->_AsyncSetStatus("error");
 		die();
 	}
 
 	protected function _AsyncSetChunks($chunks) {
-		global $memcache;
-		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_nochunks', $chunks);
+		LG_cache::set("async_{$this->async_id}_nochunks", $chunks);
 	}
 
 	protected function _AsyncSetStatus($status) {
-		global $memcache;
-		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, $status);
+		LG_cache::set("async_{$this->async_id}", $status);
 	}
 
 	protected function _AsyncWriteData($chunkno, $data) {
-		global $memcache;
-		global $global_config;
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_ch_' . $chunkno, $data);
+		LG_cache::set("async_{$this->async_id}_ch_{$chunkno}", $data);
 	}
 
 	/* These functions should be overloaded by sub-classes */

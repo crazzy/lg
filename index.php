@@ -18,6 +18,7 @@ define('LG_FORM_TYPE_DNS', 'lg_type_dns');
 
 # Inclusions
 require "config.php";
+require "lib/cache.php";
 require "lib/util.php";
 require "plugins/base.php";
 
@@ -58,7 +59,7 @@ else {
 	if(isset($_POST['async'])) {
 		$async = true;
 		$async_id = uniqid();
-		$memcache->set($global_config['memcache_prefix'] . '_async_' . $async_id, 'init');
+		LG_cache::set("async_{$async_id}", 'init');
 		set_time_limit(0);
 		ignore_user_abort(true);
 		header("Connection: close\r\n");
