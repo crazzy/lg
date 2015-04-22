@@ -80,13 +80,6 @@ class LG_PluginBase {
 		die();
 	}
 
-	protected function _CheckAsync($async_id) {
-		if(!$this->async) {
-			$this->_AbortAsync($async_id);
-		}
-		return true;
-	}
-
 	protected function _AsyncSetChunks($async_id, $chunks) {
 		global $memcache;
 		global $global_config;

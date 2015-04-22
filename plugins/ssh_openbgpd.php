@@ -20,14 +20,12 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 	}
 
 	private function RunCMD($cmd) {
-		global $async;
-		if(false !== $async) {
+		if($this->async) {
 			global $async_id;
-			$this->_CheckAsync($async_id);
 		}
 		$ssh = ssh2_connect($this->router);
 		if(!is_resource($ssh)) {
-			if(false !== $async) {
+			if($this->async) {
 				$this->AbortAsync($async_id);
 			}
 			else {
@@ -36,7 +34,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		}
 		if(!ssh2_auth_password($ssh, $this->pluginparams['ssh_username'], $this->pluginparams['ssh_password'])) {
 			$ssh = null;
-			if(false !== $async) {
+			if($this->async) {
 				$this->AbortAsync($async_id);
 			}
 			else {
@@ -45,7 +43,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		}
 		if(!($stream = ssh2_exec($ssh, $cmd))) {
 			$ssh = null;
-			if(false !== $async) {
+			if($this->async) {
 				$this->AbortAsync($async_id);
 			}
 			else {
@@ -56,7 +54,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		$result = "";
 		$i = 0;
 		while($buf = fread($stream, 4096)) {
-			if(false !== $async) {
+			if($this->async) {
 				$this->_AsyncWriteData($async_id, $i, $buf);
 				if($i == 0) {
 					$this->_AsyncSetStatus($async_id, 'data');
@@ -70,7 +68,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		fclose($stream);
 		ssh2_exec($ssh, "exit");
 		$ssh = null;
-		if(false !== $async) {
+		if($this->async) {
 			$this->_AsyncSetChunks($async_id, $i-1);
 			$this->_AsyncSetStatus($async_id, 'complete');
 			die();
