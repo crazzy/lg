@@ -8,6 +8,7 @@ $memcache->connect($global_config['memcache_host'], $global_config['memcache_por
 /* Input validation stuff */
 function lg_validate_input($input, $type) {
 	global $routers;
+	global $global_config;
 	switch($type) {
 		case 'router':
 			if(!in_array($input, array_keys($routers))) {
@@ -53,7 +54,7 @@ function lg_validate_input($input, $type) {
 			))) {
 				return false;
 			}
-			return $input;
+			return in_array($input, $global_config['checks_enabled']);
 			break;
 		default:
 			return false;
@@ -65,4 +66,10 @@ function lg_validate_input($input, $type) {
 function theme_add_js() {
 	echo '<script type="text/javascript" src="/js/jquery-2.1.3.min.js"></script>';
 	echo '<script type="text/javascript" src="/js/async.js"></script>';
+}
+
+/* Used by themes for showing/hiding check options */
+function theme_type_enabled($type) {
+	global $global_config;
+	return in_array($type, $global_config['checks_enabled']);
 }

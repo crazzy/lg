@@ -23,14 +23,22 @@
 					</select>
 				</div>
 				<div class="controls row text-center">
+					<?php if(theme_type_enabled('ping')): ?>
 					<input type="radio" checked="checked" id="<?php echo LG_FORM_TYPE_PING; ?>" name="<?php echo LG_FORM_LOOKUPTYPE; ?>" value="<?php echo LG_FORM_TYPE_PING; ?>" />
 					<label for="<?php echo LG_FORM_TYPE_PING; ?>">Ping</label>
+					<?php endif; ?>
+					<?php if(theme_type_enabled('traceroute')): ?>
 					<input type="radio" id="<?php echo LG_FORM_TYPE_TRACEROUTE; ?>" name="<?php echo LG_FORM_LOOKUPTYPE; ?>" value="<?php echo LG_FORM_TYPE_TRACEROUTE; ?>" />
 					<label for="<?php echo LG_FORM_TYPE_TRACEROUTE; ?>">Traceroute</label>
+					<?php endif; ?>
+					<?php if(theme_type_enabled('bgp')): ?>
 					<input type="radio" id="<?php echo LG_FORM_TYPE_BGP; ?>" name="<?php echo LG_FORM_LOOKUPTYPE; ?>" value="<?php echo LG_FORM_TYPE_BGP; ?>" />
 					<label for="<?php echo LG_FORM_TYPE_BGP; ?>">BGP</label>
+					<?php endif; ?>
+					<?php if(theme_type_enabled('dns')): ?>
 					<input type="radio" id="<?php echo LG_FORM_TYPE_DNS; ?>" name="<?php echo LG_FORM_LOOKUPTYPE; ?>" value="<?php echo LG_FORM_TYPE_DNS; ?>" />
 					<label for="<?php echo LG_FORM_TYPE_DNS; ?>">DNS</label>
+					<?php endif; ?>
 					<input class="btn-info" type="submit" value="Look it up!" />
 				</div>
 			</fieldset>
