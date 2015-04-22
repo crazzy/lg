@@ -64,7 +64,7 @@ class LG_Plugin_ssh_openbgpd extends LG_PluginBase {
 		}
 		fclose($stream);
 		ssh2_exec($ssh, "exit");
-		$ssh = null;
+		unset($ssh);
 		if($this->async) {
 			$this->_AsyncSetChunks($i-1);
 			$this->_AsyncSetStatus('complete');
