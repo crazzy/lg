@@ -54,7 +54,7 @@ function lg_validate_input($input, $type) {
 			))) {
 				return false;
 			}
-			return in_array($input, $global_config['checks_enabled']);
+			return $input;
 			break;
 		default:
 			return false;
@@ -72,4 +72,44 @@ function theme_add_js() {
 function theme_type_enabled($type) {
 	global $global_config;
 	return in_array($type, $global_config['checks_enabled']);
+}
+
+/* Ratelimit functions */
+function rlimit_push() {
+	global $memcache;
+	global $global_config;
+	if(empty($_SERVER['REMOTE_ADDR'])) return false;
+	$min = date('i');
+	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min);
+	if(false===$cur_rate) $cur_rate = 0;
+	$memcache->set($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min, $cur_rate+1, 0, 120);
+}
+function rlimit_check() {
+	global $memcache;
+	global $global_config;
+	if(empty($_SERVER['REMOTE_ADDR'])) return true;
+	## TODO: if cidr match whitelist return true;
+	$min = date('i');
+	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_' . $_SERVER['REMOTE_ADDR'] . '_' . $min);
+	if(false===$cur_rate) $cur_rate = 0;
+	if($cur_rate >= $global_config['ratelimit_perip']) return false;
+	return true;
+}
+function rlimit_gl_push() {
+	global $memcache;
+	global $global_config;
+	$min = date('i');
+	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_global_' . $min);
+	if(false===$cur_rate) $cur_rate = 0;
+	$memcache->set($global_config['memcache_prefix'] . '_rlimit_global_' . $min, $cur_rate, 0, 120);
+}
+function rlimit_gl_check() {
+	global $memcache;
+	global $global_config;
+	## TODO: if cifr match whitelist return true;
+	$min = date('i');
+	$cur_rate = $memcache->get($global_config['memcache_prefix'] . '_rlimit_global_' . $min);
+	if(false===$cur_rate) $cur_rate = 0;
+	if($cur_rate >= $global_config['ratelimit_global']) return false;
+	return true;
 }

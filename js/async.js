@@ -8,6 +8,10 @@ function lg_async_handle_error(jqXHR, textStatus, errorThrown) {
 	window.lg_async_error = true;
 	$("form").after('<h3>Error!</h3><p class="errmsg">There was an error sending/handling the request, please check the input data and try again.</p>');
 }
+function lg_async_handle_rlimit() {
+	window.lg_async_error = true;
+	$("form").after('<h3>Error!</h3><p class="errmsg">Your request was blocked because of ratelimiting, please wait a while and try again!</p>');
+}
 function lg_async_handler() {
 	$.ajax({
 		url: '/async.php',
@@ -82,6 +86,14 @@ $(document).ready(function() {
 					async_id = async_id.toString().trim();
 					if(async_id == "") {
 						lg_async_handle_error(jqXHR, textStatus, 'LG_no_async_id_from_server');
+						return false;
+					}
+					if(async_id == "error") {
+						lg_async_handle_error(jqXHR, textStatus, 'LG_no_async_id_from_server');
+						return false;
+					}
+					if(async_id == "ratelimit") {
+						lg_async_handle_rlimit();
 						return false;
 					}
 					window.lg_async_id = async_id;

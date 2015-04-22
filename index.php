@@ -35,6 +35,17 @@ else {
 	$router = lg_validate_input($_POST[LG_FORM_ROUTER], 'router');
 	$lookup = lg_validate_input($_POST[LG_FORM_LOOKUP], 'lookup');
 	$lookuptype = lg_validate_input($_POST[LG_FORM_LOOKUPTYPE], 'lookuptype');
+	if(!rlimit_check() or !rlimit_gl_check()) {
+		if(isset($_POST['async'])) {
+			die("ratelimit");
+		}
+		else {
+			require "themes/{$global_config['theme']}/error_ratelimit.php";
+			die();
+		}
+	}
+	rlimit_push();
+	rlimit_gl_push();
 
 	/* Async? Prepare for that! */
 	if(isset($_POST['async'])) {
