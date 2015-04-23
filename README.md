@@ -12,3 +12,11 @@ Another very interesting feature is the support for asynchronous lookups, with w
 * php5-ssh2 (Most probably, but can be avoided with a custom plugin.)
 * Memcached
 * Jquery (bundled)
+
+## Configuration
+
+See config-sample.php, copy it as config.php and edit it. It's pretty self-explaining.
+
+## Demo
+
+A live example of this software running can be seen at [AS202044](lg.as202044.net)
