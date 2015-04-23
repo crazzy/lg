@@ -105,7 +105,7 @@ class LG_PluginBase {
 		return false;
 	}
 
-	public function LookupDns($host) {
+	public function LookupDns($host, $type) {
 		return false;
 	}
 
