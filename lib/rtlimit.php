@@ -46,13 +46,15 @@ class LG_rtlimit {
 	}
 
 	private static function getrate($subject) {
-		$rate = LG_cache::get("rlimit_{$subject}_{self::$min}");
+		$min = self::$min;
+		$rate = LG_cache::get("rlimit_{$subject}_{$min}");
 		if(false===$rate) $rate = 0;
 		return $rate;
 	}
 
 	private static function setrate($subject, $rate) {
-		LG_cache::set("rlimit_{$subject}_{self::$min}", $rate, 120);
+		$min = self::$min;
+		LG_cache::set("rlimit_{$subject}_{$min}", $rate, 120);
 	}
 
 	private static function push() {
