@@ -19,4 +19,4 @@ See config-sample.php, copy it as config.php and edit it. It's pretty self-expla
 
 ## Demo
 
-A live example of this software running can be seen at [AS202044](lg.as202044.net)
+A live example of this software running can be seen at [AS202044](http://lg.as202044.net/)
