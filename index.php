@@ -19,6 +19,7 @@ define('LG_FORM_TYPE_DNS', 'lg_type_dns');
 # Inclusions
 require "config.php";
 require "lib/cache.php";
+require "lib/rtlimit.php";
 require "lib/util.php";
 require "plugins/base.php";
 
@@ -53,7 +54,7 @@ else {
 	}
 
 	/* Ratelimiting */
-	if(!rlimit_check() or !rlimit_gl_check()) {
+	if(!LG_rtlimit::check()) {
 		if($async) {
 			die("ratelimit");
 		}
@@ -62,8 +63,6 @@ else {
 			die();
 		}
 	}
-	rlimit_push();
-	rlimit_gl_push();
 
 	/* Async? Prepare for that! */
 	if($async) {
