@@ -22,7 +22,7 @@ class LG_PluginBase_SSH extends LG_PluginBase {
 	protected function RunCMD($cmd) {
 		if(!$this->CheckParams()) {
 			if($this->async) {
-				$this->AbortAsync();
+				$this->_AbortAsync();
 			}
 			else {
 				return false;
@@ -31,7 +31,7 @@ class LG_PluginBase_SSH extends LG_PluginBase {
 		$ssh = ssh2_connect($this->router);
 		if(!is_resource($ssh)) {
 			if($this->async) {
-				$this->AbortAsync();
+				$this->_AbortAsync();
 			}
 			else {
 				return false;
@@ -40,7 +40,7 @@ class LG_PluginBase_SSH extends LG_PluginBase {
 		if(!ssh2_auth_password($ssh, $this->pluginparams['ssh_username'], $this->pluginparams['ssh_password'])) {
 			$ssh = null;
 			if($this->async) {
-				$this->AbortAsync();
+				$this->_AbortAsync();
 			}
 			else {
 				return false;
@@ -49,7 +49,7 @@ class LG_PluginBase_SSH extends LG_PluginBase {
 		if(!($stream = ssh2_exec($ssh, $cmd))) {
 			$ssh = null;
 			if($this->async) {
-				$this->AbortAsync();
+				$this->_AbortAsync();
 			}
 			else {
 				return false;
