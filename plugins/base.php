@@ -74,7 +74,7 @@ class LG_PluginBase {
 		foreach($records as $record) {
 			if($record['class'] != 'IN') continue;
 			if(in_array($record['type'], array('A', 'AAAA'))) {
-				if(isset($host['ip'])) return $record['ip'];
+				if(isset($record['ip'])) return $record['ip'];
 				return $record['ipv6'];
 			}
 			if($record['type'] == 'CNAME') {
