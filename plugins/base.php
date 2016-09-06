@@ -67,11 +67,12 @@ class LG_PluginBase {
 		if($this->_is_IP($host)) {
 			return $host;
 		}
-		$records = dns_get_record("$host", DNS_ANY);
+		$records = dns_get_record("$host", DNS_ALL);
 		foreach($records as $record) {
 			if($record['class'] != 'IN') continue;
 			if(in_array($record['type'], array('A', 'AAAA'))) {
-				return $record['host'];
+				if(isset($host['ip'])) return $record['ip'];
+				return $record['ipv6'];
 			}
 			if($record['type'] == 'CNAME') {
 				$res = $this->_FollowCNAME($record['host']);
