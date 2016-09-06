@@ -67,11 +67,14 @@ class LG_PluginBase {
 		if($this->_is_IP($host)) {
 			return $host;
 		}
+		if(preg_match('/^[a-z0-9:\.]+\/[0-9]{1,3}$/', $host)) { // Has already been validated by lg_validate_input
+			return $host;
+		}
 		$records = dns_get_record("$host", DNS_ALL);
 		foreach($records as $record) {
 			if($record['class'] != 'IN') continue;
 			if(in_array($record['type'], array('A', 'AAAA'))) {
-				if(isset($host['ip'])) return $record['ip'];
+				if(isset($record['ip'])) return $record['ip'];
 				return $record['ipv6'];
 			}
 			if($record['type'] == 'CNAME') {
@@ -84,20 +87,28 @@ class LG_PluginBase {
 	}
 
 	public function _AbortAsync() {
-		$this->_AsyncSetStatus("error");
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, 'error');
 		die();
 	}
 
 	protected function _AsyncSetChunks($chunks) {
-		LG_cache::set("async_{$this->async_id}_nochunks", $chunks);
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_nochunks', $chunks);
 	}
 
 	protected function _AsyncSetStatus($status) {
-		LG_cache::set("async_{$this->async_id}", $status);
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id, $status);
 	}
 
 	protected function _AsyncWriteData($chunkno, $data) {
-		LG_cache::set("async_{$this->async_id}_ch_{$chunkno}", $data);
+		global $memcache;
+		global $global_config;
+		$memcache->set($global_config['memcache_prefix'] . '_async_' . $this->async_id . '_ch_' . $chunkno, $data);
 	}
 
 	/* These functions should be overloaded by sub-classes */
@@ -106,7 +117,7 @@ class LG_PluginBase {
 		return false;
 	}
 
-	public function LookupDns($host, $type) {
+	public function LookupDns($host) {
 		return false;
 	}
 

@@ -19,6 +19,15 @@ function lg_validate_input($input, $type) {
 			return $input;
 			break;
 		case 'lookup':
+			# CIDR support
+			if(preg_match('/^[a-z0-9:\.]+\/[0-9]{1,3}$/', $input)) {
+				$parts = explode('/', $input);
+				$cidr=true;
+				$input=$parts[0];
+			}
+			else {
+				$cidr=false;
+			}
 			# IP (both v4/v6)
 			$filter_options = array(
 				'options' => array(
@@ -28,7 +37,12 @@ function lg_validate_input($input, $type) {
 						FILTER_FLAG_NO_RES_RANGE
 			);
 			if(false !== filter_var($input, FILTER_VALIDATE_IP, $filter_options)) {
-				return $input;
+				if($cidr) {
+					return $input . '/' . $parts[1];
+				}
+				else {
+					return $input;
+				}
 			}
 			# Host name
 			if(!mb_check_encoding($input, 'ASCII')) {
